@@ -39,7 +39,7 @@ export const authService = {
       const user = isEmailExist;
 
       const payload = {
-        userId: user.id,
+        userId: user.userId,
         email: user.email,
         role: user.role,
       };
@@ -57,7 +57,7 @@ export const authService = {
         tokenData: {
           token: hashedRefreshToken,
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-          userId: user.id,
+          userId: user.userId,
         },
       });
 

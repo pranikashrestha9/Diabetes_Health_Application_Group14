@@ -4,12 +4,12 @@ import { UserRepository } from "./user.repository";
 import { CreateUserInput } from "./user.schema";
 
 export const UserService = {
-  updateUser: async (id: number, data: Partial<CreateUserInput>) => {
+  updateUser: async (userId: number, data: Partial<CreateUserInput>) => {
     const runner = await ORMHelper.createQueryRunner();
     try {
       const existingData = await UserRepository.findById({
         runner,
-        userId: id,
+        userId: userId,
       });
       if (!existingData) {
         throw new Exception("User not found", 404);
@@ -101,4 +101,60 @@ export const UserService = {
       ORMHelper.release(runner);
     }
   },
+  getUserWithMedicalData: async (userId: number) => {
+    const runner = await ORMHelper.createQueryRunner();
+    try {
+
+      const isuserExist = await UserRepository.findById({ runner, userId });
+      if (!isuserExist) {
+        throw new Exception("User not found", 404);
+      }
+      
+      const user = await UserRepository.findUserWithMedicalData({ runner, userId });
+      if (user) {
+        delete (user as any).password;
+      }
+      return user;
+    } catch (error) {
+      throw error;
+    } finally {
+      ORMHelper.release(runner);
+    }
+  },
+
+   getAllDoctors: async () => {
+    const runner = await ORMHelper.createQueryRunner();
+    try {
+      const doctors = await UserRepository.findAllDoctors({ runner });
+      return doctors;
+    } catch (error) {
+      throw error;
+    } finally {
+      ORMHelper.release(runner);
+    }
+  },
+
+   getAllPatients: async () => {
+    const runner = await ORMHelper.createQueryRunner();
+    try {
+      const patients = await UserRepository.findAllPatients({ runner });
+      return patients;
+    } catch (error) {
+      throw error;
+    } finally {
+      ORMHelper.release(runner);
+    }
+  },
+
+  getAllContentManagers: async () => {
+    const runner = await ORMHelper.createQueryRunner();
+    try {
+      const contentManagers = await UserRepository.findAllContentManagers({ runner });
+      return contentManagers;
+    } catch (error) {
+      throw error;
+    } finally {
+      ORMHelper.release(runner);
+    }
+  }
 };

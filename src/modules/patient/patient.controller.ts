@@ -32,17 +32,17 @@ export const PatientController = {
   },
 
   // ✅ Get All Patients
-//   getAllPatients: async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const response = await PatientService.getAllPatients();
+  //   getAllPatients: async (req: Request, res: Response, next: NextFunction) => {
+  //     try {
+  //       const response = await PatientService.getAllPatients();
 
-//       res
-//         .status(200)
-//         .json(messageFormater(true, response, "All patient data", 200));
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
+  //       res
+  //         .status(200)
+  //         .json(messageFormater(true, response, "All patient data", 200));
+  //     } catch (error) {
+  //       next(error);
+  //     }
+  //   },
 
   // ✅ Get Patient By UserId
   getPatientMedicalDataByUserId: async (
@@ -52,6 +52,7 @@ export const PatientController = {
   ) => {
     try {
       const { userId } = req.params;
+      console.log("Received userId:", userId);
 
       const response = await PatientService.getMedicalData(parseInt(userId));
 
@@ -68,26 +69,26 @@ export const PatientController = {
   },
 
   // ✅ Update Patient
-//   updatePatient: async (
-//     req: Request<{ userId: string }, {}, UpdatePatientInput>,
-//     res: Response,
-//     next: NextFunction,
-//   ) => {
-//     try {
-//       const { userId } = req.params;
-//       const data = req.body;
+  //   updatePatient: async (
+  //     req: Request<{ userId: string }, {}, UpdatePatientInput>,
+  //     res: Response,
+  //     next: NextFunction,
+  //   ) => {
+  //     try {
+  //       const { userId } = req.params;
+  //       const data = req.body;
 
-//       const response = await PatientService.updatePatientByUserId(userId, data);
+  //       const response = await PatientService.updatePatientByUserId(userId, data);
 
-//       res
-//         .status(200)
-//         .json(
-//           messageFormater(true, response, "Successfully updated patient", 200),
-//         );
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
+  //       res
+  //         .status(200)
+  //         .json(
+  //           messageFormater(true, response, "Successfully updated patient", 200),
+  //         );
+  //     } catch (error) {
+  //       next(error);
+  //     }
+  //   },
 
   // ✅ Delete Patient
   deletePatient: async (
@@ -112,29 +113,66 @@ export const PatientController = {
   },
 
   // ✅ Update Patient Status (via User)
-//   updatePatientStatus: async (
-//     req: Request<{ userId: string }>,
-//     res: Response,
-//     next: NextFunction,
-//   ) => {
-//     try {
-//       const { userId } = req.params;
-//       const data = req.body;
+  //   updatePatientStatus: async (
+  //     req: Request<{ userId: string }>,
+  //     res: Response,
+  //     next: NextFunction,
+  //   ) => {
+  //     try {
+  //       const { userId } = req.params;
+  //       const data = req.body;
 
-//       const response = await PatientService.updatePatient(userId, data);
+  //       const response = await PatientService.updatePatient(userId, data);
 
-//       res
-//         .status(200)
-//         .json(
-//           messageFormater(
-//             true,
-//             response,
-//             "Successfully updated patient status",
-//             200,
-//           ),
-//         );
-//     } catch (error) {
-//       next(error);
-//     }
-//   },
+  //       res
+  //         .status(200)
+  //         .json(
+  //           messageFormater(
+  //             true,
+  //             response,
+  //             "Successfully updated patient status",
+  //             200,
+  //           ),
+  //         );
+  //     } catch (error) {
+  //       next(error);
+  //     }
+  //   },
+
+  getPatientMedicalData: async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.tokenPayload.userId;
+
+      const response = await PatientService.getMedicalData(userId);
+
+      res
+        .status(200)
+        .json(messageFormater(true, response, "Patient medical data", 200));
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updatePatientMedicalData: async (
+    req: Request<{}, {}, UpdatePatientInput>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.tokenPayload.userId;
+      const data = req.body;
+
+      const response = await PatientService.updateMedicalData(userId, data);
+
+      res
+        .status(200)
+        .json(messageFormater(true, response, "Successfully updated patient medical data", 200));
+    } catch (error) {
+      next(error);
+    }
+  },
 };

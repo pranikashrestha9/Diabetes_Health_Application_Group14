@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { environment } from "./env.config";
+import { seedAdmin } from "../libs/adminSeeding";
 
 export const AppDataSource: DataSource = new DataSource({
   type: "mysql",
@@ -17,7 +18,7 @@ export const AppDataSource: DataSource = new DataSource({
 export const initializeDataSource = async () => {
   try {
     (await AppDataSource.initialize()).runMigrations();
-    //await seedAdmin(AppDataSource);
+    await seedAdmin(AppDataSource);
     console.log(`Datasource initialized successfully`);
   } catch (error) {
     console.log("Unable to connect datasource", error);

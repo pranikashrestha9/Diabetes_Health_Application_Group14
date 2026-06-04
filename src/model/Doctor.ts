@@ -1,6 +1,9 @@
 import {
-  Entity, PrimaryGeneratedColumn, Column,
-  OneToOne, JoinColumn
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
 } from "typeorm";
 import { User } from "./BaseEntity";
 
@@ -9,8 +12,11 @@ export class Doctor {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @OneToOne(() => User, (user) => user.doctor, {
+    eager: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "userId" })
   user: User;
 
   @Column()
@@ -39,4 +45,9 @@ export class Doctor {
 
   @Column({ default: 0 })
   averageRating: number;
+
+  @Column({
+    type: "simple-array",
+  })
+  availableDays: string[];
 }

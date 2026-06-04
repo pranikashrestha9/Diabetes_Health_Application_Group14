@@ -14,6 +14,15 @@ export const CreateUserSchema = z.object({
     })
     .transform((val) => val.trim()),
 
+  middeleName: z
+    .string()
+    .min(2, { message: "Middle name must be at least 2 characters" })
+    .max(50, { message: "Middle name too long" })
+    .regex(/^[A-Za-z\s]+$/, {
+      message: "Middle name can only contain letters",
+    })
+    .transform((val) => val.trim()).optional(),
+
   lastName: z
     .string()
     .min(2, { message: "Last name must be at least 2 characters" })
@@ -44,44 +53,37 @@ export const CreateUserSchema = z.object({
       message: "Password must include at least one special character",
     }),
 
-  mobileNumber: z
-    .string()
-    .regex(/^[0-9]{7,15}$/, {
-      message: "Mobile number must be 7–15 digits",
-    }),
+  mobileNumber: z.string().regex(/^[0-9]{7,15}$/, {
+    message: "Mobile number must be 7–15 digits",
+  }),
 
-  address: z
-    .string()
-    .max(255, { message: "Address too long" })
-    .optional(),
+  address: z.string().max(255, { message: "Address too long" }).optional(),
 
- gender: z.enum(["MALE", "FEMALE", "OTHER"], {
-  message: "Invalid gender value",
-}),
+  gender: z.enum(["MALE", "FEMALE", "OTHER"], {
+    message: "Invalid gender value",
+  }),
 
   dateOfBirth: z.coerce.date({
-     message: "Invalid date format" ,
+    message: "Invalid date format",
   }),
 
   profileImageURL: z
-    .string({message: "Profile image URL must be a string"})
-      .url({ message: "Invalid URL format" })
+    .string({ message: "Profile image URL must be a string" })
+    .url({ message: "Invalid URL format" })
     .optional(),
 
   role: z.enum(["PATIENT", "DOCTOR", "ADMIN", "CONTENT_MANAGER"], {
     message: "Invalid role",
   }),
 
-  isActive: z
-    .enum(["ACTIVE", "INACTIVE", "BLOCKED"])
-    .default("ACTIVE"),
+  isActive: z.enum(["ACTIVE", "INACTIVE", "BLOCKED"]).default("ACTIVE"),
 });
-
 
 export const UserIdSchema = z.object({
   userId: z.string(),
 });
 
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
+
 export type UpdateUserInput = Partial<CreateUserInput>;
 export type UserIdInput = z.infer<typeof UserIdSchema>;

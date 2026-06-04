@@ -56,6 +56,8 @@ export const PatientService = {
   } catch (error) {
     await ORMHelper.rollBackTransaction(runner);
     throw error;
+  }finally {
+    ORMHelper.release(runner);
   }
 },
 
@@ -110,29 +112,29 @@ export const PatientService = {
       ORMHelper.release(runner);
     }
   },
-  //   updatePatientById: async (
-  //     id: number,
-  //     data: Partial<CreatePatientInput>,
-  //   ) => {
-  //     const runner = await ORMHelper.createQueryRunner();
-  //     try {
-  //       const patient = await PatientRepository.findById({ runner, id });
-  //       if (!patient) {
-  //         throw new Exception("Patient not found", 404);
-  //       }
+    updateMedicalData: async (
+      userId: number,
+      data: Partial<CreatePatientInput>,
+    ) => {
+      const runner = await ORMHelper.createQueryRunner();
+      try {
+        const patient = await PatientRepository.findByUserId({ runner, userId });
+        if (!patient) {
+          throw new Exception("Patient not found", 404);
+        }
 
-  //       const response = await PatientRepository.updatePatientById({
-  //         runner,
-  //         existingData: patient,
-  //         data,
-  //       });
-  //       return response;
-  //     } catch (error: any) {
-  //       throw error;
-  //     } finally {
-  //       ORMHelper.release(runner);
-  //     }
-  //   },
+        const response = await PatientRepository.updatePatientMedicalData({
+          runner,
+          existingPatient: patient,
+          data,
+        });
+        return response;
+      } catch (error: any) {
+        throw error;
+      } finally {
+        ORMHelper.release(runner);
+      }
+    },
 
   //   updateIsActiveStatus: async (
   //     id: number,
@@ -144,7 +146,7 @@ export const PatientService = {
   //       if (!patient) {
   //         throw new Exception("Patient not found", 404);
   //       }
-  //       const response = await PatientRepository.updatePatientById({
+  //       const response = await PatientRepository.updatePatientMedicalData({
   //         runner,
   //         existingData: patient,
   //         data,

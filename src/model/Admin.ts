@@ -9,7 +9,12 @@ export class Admin {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+ @OneToOne(() => User, (user) => user.admin, {
+    eager: true,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn({ name: "userId" })
   user: User;
+
+
 }

@@ -4,13 +4,17 @@ import {
   Column,
   CreateDateColumn,
   OneToOne,
+  
 } from "typeorm";
 import { RefreshToken } from "./Refresh";
+import { Patient } from "./Patient";
+import { Doctor } from "./Doctor";
+import { Admin } from "./Admin";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  userId: number;
 
   @Column()
   firstName: string;
@@ -63,7 +67,15 @@ export class User {
   @CreateDateColumn()
   createdAt: Date;
 
-
-    @OneToOne(() => RefreshToken, (refreshToken) => refreshToken.user)
+  @OneToOne(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshToken[];
+
+  @OneToOne(() => Patient, (patient) => patient.user)
+  patient: Patient;
+
+  @OneToOne(() => Doctor, (doctor) => doctor.user)
+  doctor: Doctor;
+
+  @OneToOne(() => Admin, (admin) => admin.user)
+  admin: Admin;
 }

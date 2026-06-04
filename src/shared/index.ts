@@ -4,6 +4,7 @@ import { newsRouter } from "../modules/newsletter/newsletter.routes";
 import { patientRoutes } from "../modules/patient/patient.routes";
 import { userRoutes } from "../modules/user/user.routes";
 import { authRoutes } from "../auth/auth.routes";
+import { doctorDataRouter } from "../modules/Doctor/doctorData.routes";
 
 export const router = (app: Express) => {
   const router = Router();
@@ -13,6 +14,7 @@ export const router = (app: Express) => {
    authRoutes(router);
   otpRoutes(router);
   newsRouter(router);
+  doctorDataRouter(router);
   app.use("/api/v1/", router);
   app.get("/", (req, res) => {
     res.status(200).json({ message: "Server is healthy" });

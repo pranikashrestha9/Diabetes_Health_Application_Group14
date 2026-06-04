@@ -9,7 +9,7 @@ const accessType = {
 
 interface ValidationOptions {
   checkAdmin?: boolean;
-  checkDocter?: boolean;
+  checkDoctor?: boolean;
   checkPatient?: boolean;
   checkContentManager?: boolean;
 }
@@ -36,18 +36,20 @@ export const validateToken = (options: ValidationOptions = {}) => {
 
       // Role-based validation — if multiple flags set, any matching role is allowed
       const { role } = decoded;
-      const { checkAdmin, checkDocter, checkPatient, checkContentManager } = options;
+      const { checkAdmin, checkDoctor, checkPatient, checkContentManager } =
+        options;
 
       const allowedRoles: string[] = [];
-      if (checkAdmin)     allowedRoles.push("ADMIN");
-      if (checkDocter)    allowedRoles.push("DOCTOR");
-      if (checkPatient)   allowedRoles.push("PATIENT");
+      if (checkAdmin) allowedRoles.push("ADMIN");
+      if (checkDoctor) allowedRoles.push("DOCTOR");
+      if (checkPatient) allowedRoles.push("PATIENT");
       if (checkContentManager) allowedRoles.push("CONTENT_MANAGER");
 
       if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
-        const label = allowedRoles.length === 1
-          ? allowedRoles[0].toLowerCase()
-          : allowedRoles.map(r => r.toLowerCase()).join(" or ");
+        const label =
+          allowedRoles.length === 1
+            ? allowedRoles[0].toLowerCase()
+            : allowedRoles.map((r) => r.toLowerCase()).join(" or ");
         throw new Exception(`Not authorized as ${label}`, 403);
       }
 

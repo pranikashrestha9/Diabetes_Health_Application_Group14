@@ -47,7 +47,7 @@ export const PatientRepository = {
     try {
       const repo = runner.manager.getRepository(Patient);
       return await repo.find({
-         relations: ["user"],
+        relations: ["user"],
       });
     } catch (error: any) {
       error.level = "DB";
@@ -55,7 +55,7 @@ export const PatientRepository = {
     }
   },
 
-   deleteById: async ({ runner, patientId }: Runner & { patientId: number }) => {
+  deleteById: async ({ runner, patientId }: Runner & { patientId: number }) => {
     const repo = runner.manager.getRepository("Patient");
     try {
       const result = await repo.delete({ id: patientId });
@@ -66,16 +66,34 @@ export const PatientRepository = {
     }
   },
 
-    findByUserId: async ({ runner, userId }: Runner & { userId: number }) => {
+  findByUserId: async ({ runner, userId }: Runner & { userId: number }) => {
     const repo = runner.manager.getRepository(Patient);
 
     try {
       return await repo.findOne({
         where: {
-          user: { id: userId },
+          user: { userId: userId },
         },
         relations: ["user"],
       });
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  },
+
+  updatePatientMedicalData: async ({
+    runner,
+    existingPatient,
+    data,
+  }: Runner & {
+    existingPatient: Patient;
+    data: Partial<CreatePatientInput>;
+  }) => {
+    const repo = runner.manager.getRepository(Patient);
+    try {
+      Object.assign(existingPatient, data);
+      return await repo.save(existingPatient);
     } catch (error: any) {
       error.level = "DB";
       throw error;
