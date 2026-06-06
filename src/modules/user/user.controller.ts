@@ -78,17 +78,15 @@ export const UserController = {
 
   // ✅ Update User
   updateUserok: async (
-    req: Request<UserIdInput, {}, UpdateUserInput>,
+    req: Request<{}, {}, UpdateUserInput>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
-      const { userId } = req.params;
-      const id = Number(userId);
+      const id = req.tokenPayload.userId; // Assuming userId is in token payload for authenticated users.
       const data = req.body;
       console.log("Received update data:", data);
       const response = await UserService.updateUser(id, data);
-
       res
         .status(200)
         .json(
@@ -127,9 +125,9 @@ export const UserController = {
   ) => {
     try {
       const { userId } = req.params;
-      console.log(userId);
+
       const id = Number(userId);
-      console.log(id);
+
       const response = await UserService.getUserWithMedicalData(id);
       res
         .status(200)

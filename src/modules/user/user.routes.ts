@@ -40,7 +40,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/users",
-    //  validateToken({ checkAdmin: true }),
+  //  validateToken({ checkAdmin: true }),
     UserController.getAllUsers,
   );
 
@@ -55,6 +55,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/user/:userId",
+   validateToken({ checkAdmin: true }),
     ZOD.requestParser({
       schema: UserIdSchema,
       type: "Params",
@@ -64,7 +65,7 @@ export const userRoutes = (router: Router) => {
 
   router.delete(
     "/user/:userId",
-    // validateToken({ checkAdmin: true }),
+    validateToken({ checkAdmin: true }),
     ZOD.requestParser({
       schema: UserIdSchema,
       type: "Params",
@@ -73,16 +74,13 @@ export const userRoutes = (router: Router) => {
   );
 
   router.patch(
-    "/user/:userId",
+    "/update/user",
+    validateToken({ checkPatient: true, checkDoctor: true, checkContentManager: true }),
     ZOD.requestParser(
       {
         schema: CreateUserSchema.partial(),
         type: "Body",
-      },
-      {
-        schema: UserIdSchema,
-        type: "Params",
-      },
+      }
     ),
     // (req) => console.log("hello", req.body, req.params),
     UserController.updateUserok,
@@ -90,7 +88,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/patients",
-    validateToken({ checkAdmin: true }),
+   // validateToken({ checkAdmin: true }),
     UserController.getAllPatients,
   );
   router.get(

@@ -21,7 +21,7 @@ export const patientRoutes = (router: Router) => {
 
   router.delete(
     "/patient/:id",
-    // validateToken({ checkAdmin: true }),
+    validateToken({ checkAdmin: true }),
     PatientController.deletePatient,
   );
 
@@ -34,7 +34,6 @@ export const patientRoutes = (router: Router) => {
   router.patch(
     "/update/patient-medical-data",
     validateToken({ checkPatient: true }),
-
     ZOD.requestParser({
       schema: UpdatePatientSchema,
       type: "Body",
