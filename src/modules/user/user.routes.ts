@@ -88,7 +88,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/patients",
-   // validateToken({ checkAdmin: true }),
+    validateToken({ checkAdmin: true }),
     UserController.getAllPatients,
   );
   router.get(
