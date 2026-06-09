@@ -30,4 +30,10 @@ export const doctorDataRouter = (router: Router) => {
     validateToken({ checkDoctor: true }),
     DoctorDataController.getDoctorData,
   );
+
+  router.get(
+    "/doctor-data/:doctorId",
+    validateToken({ checkDoctor: true }),
+    DoctorDataController.getDoctorDataByDoctorId,
+  );
 };

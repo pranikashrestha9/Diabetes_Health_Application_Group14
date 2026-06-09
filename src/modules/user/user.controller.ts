@@ -70,6 +70,10 @@ export const UserController = {
         throw new Exception("User not found", 404);
       }
 
+      if (response.profileImageURL) {
+        response.profileImageURL = `${req.protocol}://${req.get("host")}${response.profileImageURL}`;
+      }
+
       res.status(200).json(messageFormater(true, response, "User data", 200));
     } catch (error) {
       next(error);
@@ -77,7 +81,7 @@ export const UserController = {
   },
 
   // ✅ Update User
-  updateUserok: async (
+  updateUser: async (
     req: Request<{}, {}, UpdateUserInput>,
     res: Response,
     next: NextFunction,
@@ -87,6 +91,10 @@ export const UserController = {
       const data = req.body;
       console.log("Received update data:", data);
       const response = await UserService.updateUser(id, data);
+
+      if (response.profileImageURL) {
+        response.profileImageURL = `${req.protocol}://${req.get("host")}${response.profileImageURL}`;
+      }
       res
         .status(200)
         .json(
@@ -129,6 +137,10 @@ export const UserController = {
       const id = Number(userId);
 
       const response = await UserService.getUserWithMedicalData(id);
+
+      if (response.profileImageURL) {
+        response.profileImageURL = `${req.protocol}://${req.get("host")}${response.profileImageURL}`;
+      }
       res
         .status(200)
         .json(
@@ -141,11 +153,18 @@ export const UserController = {
 
   getAllDoctors: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const response = await UserService.getAllDoctors();
+      const users = await UserService.getAllDoctors();
+
+      const formatted = users.map((user: any) => ({
+        ...user,
+        profileImageURL: user.profileImageURL
+          ? `${req.protocol}://${req.get("host")}${user.profileImageURL}`
+          : null,
+      }));
 
       res
         .status(200)
-        .json(messageFormater(true, response, "All doctors data", 200));
+        .json(messageFormater(true, "All doctors data", formatted, 200));
     } catch (error) {
       next(error);
     }
@@ -153,10 +172,18 @@ export const UserController = {
 
   getAllPatients: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const response = await UserService.getAllPatients();
+      const users = await UserService.getAllPatients();
+
+      const formatted = users.map((user: any) => ({
+        ...user,
+        profileImageURL: user.profileImageURL
+          ? `${req.protocol}://${req.get("host")}${user.profileImageURL}`
+          : null,
+      }));
+
       res
         .status(200)
-        .json(messageFormater(true, response, "All patients data", 200));
+        .json(messageFormater(true, "All patients data", formatted, 200));
     } catch (error) {
       next(error);
     }
@@ -168,14 +195,44 @@ export const UserController = {
     next: NextFunction,
   ) => {
     try {
-      const response = await UserService.getAllContentManagers();
+      const users = await UserService.getAllContentManagers();
+
+      const formatted = users.map((user: any) => ({
+        ...user,
+        profileImageURL: user.profileImageURL
+          ? `${req.protocol}://${req.get("host")}${user.profileImageURL}`
+          : null,
+      }));
+
+      res
+        .status(200)
+        .json(messageFormater(true, "All content managers data", formatted, 200));
+    } catch (error) {
+      next(error);
+    }
+  },
+
+    updateUserStatus: async (
+    req: Request<UserIdInput, {}, UpdateUserInput>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { userId } = req.params;
+      const id = Number(userId);
+      const data = req.body;
+      const response = await UserService.updateUser(id, data);
+
+      if (response.profileImageURL) {
+        response.profileImageURL = `${req.protocol}://${req.get("host")}${response.profileImageURL}`;
+      }
       res
         .status(200)
         .json(
-          messageFormater(true, response, "All content managers data", 200),
+          messageFormater(true, response, "User status updated successfully", 200),
         );
     } catch (error) {
       next(error);
     }
   },
-};
+};    

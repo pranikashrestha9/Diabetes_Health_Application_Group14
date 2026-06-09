@@ -61,4 +61,18 @@ export const DoctorRepository = {
       throw error;
     }
   },
+
+  getDoctorByDoctorId: async ({ runner, doctorId }: Runner & { doctorId: number }) => {
+    const repo = runner.manager.getRepository(Doctor);
+    try{
+      const doctor = await repo.findOne({
+        where: { id: doctorId },
+        
+      });
+      return doctor;
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  }
 };

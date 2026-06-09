@@ -122,4 +122,22 @@ export const DoctorDataService = {
       ORMHelper.release(runner);
     }
   },
+
+  getDoctorDataByDoctorId: async (doctorId: number) => {
+    const runner = await ORMHelper.createQueryRunner();
+    try {
+      const doctor = await DoctorRepository.getDoctorByDoctorId({
+        runner,
+        doctorId,
+      });
+
+      if (!doctor) {
+        throw new Exception("Doctor not found", 404);
+      }
+
+      return doctor;
+    } catch (error: any) {
+      throw error;
+    }
+  },
 };

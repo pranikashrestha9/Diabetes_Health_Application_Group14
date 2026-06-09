@@ -75,4 +75,27 @@ export const DoctorDataController = {
       next(error);
     }
   },
+
+  getDoctorDataByDoctorId: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const doctorId = Number(req.params.doctorId);
+      const response = await DoctorDataService.getDoctorDataByDoctorId(doctorId);
+      res
+        .status(200)
+        .json(
+          messageFormater(
+            true,
+            response,
+            "Doctor data retrieved successfully",
+            200
+          )
+        );
+    } catch (error) {
+      next(error);
+    }
+  }
 };

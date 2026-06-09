@@ -83,7 +83,23 @@ export const userRoutes = (router: Router) => {
       }
     ),
     // (req) => console.log("hello", req.body, req.params),
-    UserController.updateUserok,
+    UserController.updateUser,
+  );
+
+   router.patch(
+    "/userStatus/:userId",
+    validateToken({ checkPatient: true, checkDoctor: true, checkContentManager: true }),
+    ZOD.requestParser(
+      {
+        schema: CreateUserSchema.partial(),
+        type: "Body",
+      },{
+         schema: UserIdSchema,
+         type: "Params",
+      }
+    ),
+    // (req) => console.log("hello", req.body, req.params),
+    UserController.updateUser,
   );
 
   router.get(
