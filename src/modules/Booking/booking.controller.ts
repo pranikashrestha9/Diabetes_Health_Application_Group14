@@ -50,9 +50,11 @@ export const BookingController = {
 
       const response = await BookingService.approveBooking(id);
 
+      const cleanResponse = formatBookingResponse(response);
+
       res
         .status(200)
-        .json(messageFormater(true, "Booking approved", response, 200));
+        .json(messageFormater(true, "Booking approved", cleanResponse, 200));
     } catch (error) {
       next(error);
     }
@@ -72,6 +74,8 @@ export const BookingController = {
 
       const response = await BookingService.denyBooking(id);
 
+      const cleanResponse = formatBookingResponse(response);
+         
       res
         .status(200)
         .json(messageFormater(true, "Booking cancelled", response, 200));

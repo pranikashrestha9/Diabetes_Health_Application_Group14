@@ -33,8 +33,6 @@ export const bookingRouter = (router: Router) => {
     BookingController.approveBooking,
   );
 
-
-  
   router.patch(
     "/deny-booking/:bookingId",
     validateToken({ checkDoctor: true }),
@@ -44,5 +42,4 @@ export const bookingRouter = (router: Router) => {
     }),
     BookingController.denyBooking,
   );
-
 };
