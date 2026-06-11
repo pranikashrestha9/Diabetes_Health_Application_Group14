@@ -78,7 +78,7 @@ export const userRoutes = (router: Router) => {
     validateToken({
       checkPatient: true,
       checkDoctor: true,
-      checkContentManager: true,
+      checkInternalManager: true,
     }),
     ZOD.requestParser({
       schema: CreateUserSchema.partial(),
@@ -93,7 +93,7 @@ export const userRoutes = (router: Router) => {
     validateToken({
       checkPatient: true,
       checkDoctor: true,
-      checkContentManager: true,
+      checkInternalManager: true,
     }),
     ZOD.requestParser(
       {

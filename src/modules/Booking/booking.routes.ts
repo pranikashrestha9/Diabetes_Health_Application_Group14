@@ -3,16 +3,23 @@ import { validateToken } from "../../auth/validateToken";
 import ZOD from "../../middlewares/schemaValidator";
 import { BookingController } from "./booking.controller";
 import { bookingIdSchema, CreateBookingSchema } from "./booking.schema";
+import { DoctorIdParam } from "../Doctor/doctorData.schema";
 
 export const bookingRouter = (router: Router) => {
   router.post(
-    "/book-appointment",
+    "/book-appointment/:doctorId",
     validateToken({ checkPatient: true }),
 
-    ZOD.requestParser({
-      schema: CreateBookingSchema,
-      type: "Body",
-    }),
+    ZOD.requestParser(
+      {
+        schema: CreateBookingSchema,
+        type: "Body",
+      },
+      {
+        schema: DoctorIdParam,
+        type: "Params",
+      },
+    ),
     //(req) => console.log("hello", req.body),
     BookingController.createBooking,
   );

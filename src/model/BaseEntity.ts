@@ -10,6 +10,7 @@ import { RefreshToken } from "./Refresh";
 import { Patient } from "./Patient";
 import { Doctor } from "./Doctor";
 import { Admin } from "./Admin";
+import { InternalManager } from "./InternalManager";
 
 @Entity()
 export class User {
@@ -61,7 +62,7 @@ export class User {
 
   @Column({
     type: "enum",
-    enum: ["ADMIN", "PATIENT", "DOCTOR", "CONTENT_MANAGER"],
+    enum: ["ADMIN", "PATIENT", "DOCTOR", "INTERNAL_MANAGER"],
     default: "PATIENT",
   })
   role: string;
@@ -80,4 +81,7 @@ export class User {
 
   @OneToOne(() => Admin, (admin) => admin.user)
   admin: Admin;
+
+  @OneToOne(() => InternalManager, (internalManager) => internalManager.user)
+  internalManager: InternalManager;
 }

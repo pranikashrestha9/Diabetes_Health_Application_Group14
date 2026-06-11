@@ -3,6 +3,7 @@ import { MeetLinkGenerator } from "../../libs/linkGenerator";
 import { mailService } from "../../libs/mailService";
 import ORMHelper from "../../libs/ORMHelper";
 import { DoctorRepository } from "../Doctor/doctorData.repository";
+import { PaymentRepository } from "../Payment/payment.repository";
 import { UserRepository } from "../user/user.repository";
 import { BookingRepository } from "./booking.repository";
 import { CreateBookingDTO } from "./booking.schema";
@@ -10,9 +11,11 @@ import { CreateBookingDTO } from "./booking.schema";
 export const BookingService = {
   createBooking: async ({
     userPatientId,
+    doctorId,
     bookingData,
   }: {
     userPatientId: number;
+      doctorId: number;
     bookingData: CreateBookingDTO;
   }) => {
     const runner = await ORMHelper.createQueryRunner();
@@ -33,7 +36,7 @@ export const BookingService = {
       // ✅ 2. Check doctor exists
       const doctor = await DoctorRepository.getDoctorByDoctorId({
         runner,
-        doctorId: bookingData.doctorId,
+        doctorId: doctorId,
       });
 
       if (!doctor) {
@@ -61,9 +64,17 @@ export const BookingService = {
         },
       });
 
+
+      const paymentData = await PaymentRepository.create({ runner,booking, amount: doctor.consultationFee });
+
+      const bookingWithPayment = {
+        ...booking,
+        payment: paymentData,
+      };
+
       await ORMHelper.commitTransaction(runner);
 
-      return booking;
+      return bookingWithPayment;
     } catch (error) {
       await ORMHelper.rollBackTransaction(runner);
       throw error;

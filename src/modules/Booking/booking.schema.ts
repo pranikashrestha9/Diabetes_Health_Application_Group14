@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CreateBookingSchema = z
   .object({
-    doctorId: z.number(),
+   
     bookingDate: z.string(), // YYYY-MM-DD
 
     startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/),

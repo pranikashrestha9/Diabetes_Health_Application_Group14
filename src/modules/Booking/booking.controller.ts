@@ -3,19 +3,26 @@ import { messageFormater } from "../../libs/messageFormater";
 import { BookingService } from "./booking.service";
 import { BookingIdDTO, CreateBookingDTO } from "./booking.schema";
 import { formatBookingResponse } from "../../libs/ResponseFormat/bookingResponseFormat";
+import { DoctorIdParamType } from "../Doctor/doctorData.schema";
 
 export const BookingController = {
   createBooking: async (
-    req: Request<{}, {}, CreateBookingDTO>,
+    req: Request<DoctorIdParamType, {}, CreateBookingDTO>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
       const id = req.tokenPayload.userId;
+      const doctorId = Number(req.params.doctorId);
+
+      if (isNaN(doctorId)) {
+        throw new Error("Invalid doctor id");
+      }
       const userPatientId = Number(id);
 
       const response = await BookingService.createBooking({
         userPatientId,
+        doctorId,
         bookingData: req.body,
       });
 

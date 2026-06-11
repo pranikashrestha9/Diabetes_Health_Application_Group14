@@ -48,7 +48,12 @@ export const CreateDoctorSchema = z.object({
     )
     .min(1),
 });
-
+export const DoctorIdParam = z.object({
+  doctorId: z.string().regex(/^\d+$/, "Invalid doctor ID"),
+});
 
 export type CreateDoctorInput = z.infer<typeof CreateDoctorSchema>;
 export type UpdateDoctorInput = Partial<CreateDoctorInput>;
+export type DoctorIdParamType = z.infer<typeof DoctorIdParam>;
+
+

@@ -47,9 +47,15 @@ export const UserController = {
     try {
       const response = await UserService.getAllUsers();
 
+      const formatted = response.map((user: any) => ({
+        ...user,
+        profileImageURL: user.profileImageURL
+          ? `${req.protocol}://${req.get("host")}${user.profileImageURL}`
+          : null,
+      }));
       res
         .status(200)
-        .json(messageFormater(true, response, "All users data", 200));
+        .json(messageFormater(true, formatted, "All users data", 200));
     } catch (error) {
       next(error);
     }
@@ -206,13 +212,15 @@ export const UserController = {
 
       res
         .status(200)
-        .json(messageFormater(true, "All content managers data", formatted, 200));
+        .json(
+          messageFormater(true, "All content managers data", formatted, 200),
+        );
     } catch (error) {
       next(error);
     }
   },
 
-    updateUserStatus: async (
+  updateUserStatus: async (
     req: Request<UserIdInput, {}, UpdateUserInput>,
     res: Response,
     next: NextFunction,
@@ -229,10 +237,15 @@ export const UserController = {
       res
         .status(200)
         .json(
-          messageFormater(true, response, "User status updated successfully", 200),
+          messageFormater(
+            true,
+            response,
+            "User status updated successfully",
+            200,
+          ),
         );
     } catch (error) {
       next(error);
     }
   },
-};    
+};

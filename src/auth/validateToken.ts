@@ -11,7 +11,7 @@ interface ValidationOptions {
   checkAdmin?: boolean;
   checkDoctor?: boolean;
   checkPatient?: boolean;
-  checkContentManager?: boolean;
+  checkInternalManager?: boolean;
 }
 
 export const validateToken = (options: ValidationOptions = {}) => {
@@ -36,14 +36,14 @@ export const validateToken = (options: ValidationOptions = {}) => {
 
       // Role-based validation — if multiple flags set, any matching role is allowed
       const { role } = decoded;
-      const { checkAdmin, checkDoctor, checkPatient, checkContentManager } =
+      const { checkAdmin, checkDoctor, checkPatient, checkInternalManager } =
         options;
 
       const allowedRoles: string[] = [];
       if (checkAdmin) allowedRoles.push("ADMIN");
       if (checkDoctor) allowedRoles.push("DOCTOR");
       if (checkPatient) allowedRoles.push("PATIENT");
-      if (checkContentManager) allowedRoles.push("CONTENT_MANAGER");
+      if (checkInternalManager) allowedRoles.push("INTERNAL_MANAGER");
 
       if (allowedRoles.length > 0 && !allowedRoles.includes(role)) {
         const label =

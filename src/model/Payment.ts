@@ -1,0 +1,36 @@
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Booking } from "./Booking";
+
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  PAID = "PAID",
+  FAILED = "FAILED",
+}
+
+@Entity()
+export class Payment {
+  @PrimaryGeneratedColumn()
+  paymentId: number;
+
+  @ManyToOne(() => Booking, { onDelete: "CASCADE" })
+  booking: Booking;
+
+  @Column()
+  amount: number;
+
+  @Column({
+    type: "enum",
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
+  })
+  status: PaymentStatus;
+
+  @Column({ nullable: true })
+  transactionId: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @Column({ nullable: true })
+  paidAt: Date;
+}
