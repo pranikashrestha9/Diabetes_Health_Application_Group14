@@ -9,6 +9,8 @@ import { bookingRouter } from "../modules/Booking/booking.routes";
 import { PrescriptionRoutes } from "../modules/Prescription/prescription.routes";
 import { RecommendationRoutes } from "../modules/Recommendation/recommendation.routes";
 import { blogRouter } from "../modules/Blog/blog.routes";
+import { paymentRouter } from "../modules/Payment/payment.routes";
+import { payoutRoutes } from "../modules/Payout/payout.routes";
 
 export const router = (app: Express) => {
   const router = Router();
@@ -23,6 +25,8 @@ export const router = (app: Express) => {
   PrescriptionRoutes(router); 
   RecommendationRoutes(router);
   blogRouter(router);
+  paymentRouter(router);
+  payoutRoutes(router);
   app.use("/api/v1/", router);
   app.get("/", (req, res) => {
     res.status(200).json({ message: "Server is healthy" });

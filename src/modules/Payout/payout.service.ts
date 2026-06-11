@@ -1,0 +1,87 @@
+import ORMHelper from "../../libs/ORMHelper";
+import { Payment } from "../../model/Payment";
+import { PaymentRepository } from "../Payment/payment.repository";
+import { PayoutItemRepository } from "../PayoutItem/payoutItem.repository";
+import { PayoutRepository } from "./payout.repository";
+
+export const PayoutService = {
+  createPayout: async (data: {
+    doctorId: number;
+    markAsPaid?: boolean;
+    
+  }) => {
+    const runner = await ORMHelper.createQueryRunner();
+    await runner.startTransaction();
+
+    try {
+      const { doctorId, markAsPaid } = data;
+
+      // ✅ 1. AUTO FETCH ALL PAID PAYMENTS
+      const payments = await PaymentRepository.findPaidByDoctor({
+        runner,
+        doctorId,
+      });
+
+      if (!payments.length) {
+        throw new Error("No paid payments found for this doctor");
+      }
+
+      // ✅ 2. Check already processed payouts
+      const existing = await PayoutItemRepository.findExistingByPaymentIds({
+        runner,
+        paymentIds: payments.map((p: Payment) => p.paymentId),
+      });
+
+      if (existing.length > 0) {
+        throw new Error("Some payments already included in payout");
+      }
+
+      // ✅ 3. Calculate earnings
+      let totalAmount = 0;
+
+      const items = payments.map((p: Payment) => {
+        const doctorEarning = p.amount * 0.8; // FIXED RULE
+        totalAmount += doctorEarning;
+
+        return {
+          payment: p,
+          doctorEarning,
+        };
+      });
+
+      // ✅ 4. Create payout
+      const payout = await PayoutRepository.create({
+        runner,
+        doctorId,
+        totalAmount,
+        status: markAsPaid ? "PAID" : "PENDING",
+       
+        paidAt: markAsPaid ? new Date() : null,
+      });
+
+      // ✅ 5. Save payout items
+      for (const item of items) {
+        await PayoutItemRepository.create({
+          runner,
+          payout,
+          payment: item.payment,
+          doctorEarning: item.doctorEarning,
+        });
+      }
+
+      await runner.commitTransaction();
+
+      return {
+        payoutId: payout.payoutId,
+        totalAmount,
+        totalPayments: items.length,
+        status: payout.status,
+      };
+    } catch (error) {
+      await runner.rollbackTransaction();
+      throw error;
+    } finally {
+      await ORMHelper.release(runner);
+    }
+  },
+};
