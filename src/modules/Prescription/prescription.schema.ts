@@ -10,7 +10,7 @@ export const MedicineSchema = z.object({
 });
 
 export const CreatePrescriptionSchema = z.object({
-  bookingId: z.number(),
+ 
 
   medicines: z.array(MedicineSchema).min(1, {
     message: "At least one medicine is required",

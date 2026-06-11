@@ -40,7 +40,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/users",
-  //  validateToken({ checkAdmin: true }),
+    //  validateToken({ checkAdmin: true }),
     UserController.getAllUsers,
   );
 
@@ -55,7 +55,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/user/:userId",
-   validateToken({ checkAdmin: true }),
+    validateToken({ checkAdmin: true }),
     ZOD.requestParser({
       schema: UserIdSchema,
       type: "Params",
@@ -75,28 +75,35 @@ export const userRoutes = (router: Router) => {
 
   router.patch(
     "/update/user",
-    validateToken({ checkPatient: true, checkDoctor: true, checkContentManager: true }),
-    ZOD.requestParser(
-      {
-        schema: CreateUserSchema.partial(),
-        type: "Body",
-      }
-    ),
+    validateToken({
+      checkPatient: true,
+      checkDoctor: true,
+      checkContentManager: true,
+    }),
+    ZOD.requestParser({
+      schema: CreateUserSchema.partial(),
+      type: "Body",
+    }),
     // (req) => console.log("hello", req.body, req.params),
     UserController.updateUser,
   );
 
-   router.patch(
+  router.patch(
     "/userStatus/:userId",
-    validateToken({ checkPatient: true, checkDoctor: true, checkContentManager: true }),
+    validateToken({
+      checkPatient: true,
+      checkDoctor: true,
+      checkContentManager: true,
+    }),
     ZOD.requestParser(
       {
         schema: CreateUserSchema.partial(),
         type: "Body",
-      },{
-         schema: UserIdSchema,
-         type: "Params",
-      }
+      },
+      {
+        schema: UserIdSchema,
+        type: "Params",
+      },
     ),
     // (req) => console.log("hello", req.body, req.params),
     UserController.updateUser,
@@ -109,7 +116,7 @@ export const userRoutes = (router: Router) => {
   );
   router.get(
     "/doctors",
-    validateToken({ checkAdmin: true }),
+    validateToken({ checkAdmin: true, checkPatient: true }),
     UserController.getAllDoctors,
   );
   router.get(

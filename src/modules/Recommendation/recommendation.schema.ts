@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const CreateRecommendationSchema = z.object({
-  bookingId: z.number(),
+ 
 
   advice: z.string().min(3),
 
