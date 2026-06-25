@@ -5,9 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  OneToOne,
 } from "typeorm";
 import { User } from "./BaseEntity";
 import { Doctor } from "./Doctor";
+import { Payment } from "./Payment";
 
 @Entity()
 export class Booking {
@@ -48,4 +50,10 @@ export class Booking {
 
   @CreateDateColumn()
   createdAt: Date;
+
+@OneToOne(() => Payment, (payment) => payment.booking, {
+  eager: true,
+})
+payment: Payment;
+  
 }
