@@ -6,17 +6,24 @@ const unsync = (_file: string) => {
     if (fs.existsSync(_file)) {
       fs.unlinkSync(_file);
       return true;
+    } else {
+      return false;
     }
-
-    return false;
   } catch (error) {
+    console.error("🔥 Delete error:", error);
     throw error;
   }
 };
 
 export const unsyncFromPublic = (_file: string) => {
-  // Always resolve relative to project root
-
-  return unsync(path.resolve("public/", _file));
+  // remove leading slash if exists
+  const cleanPath = _file.replace(/^\/+/, "");
+  // remove "public/" if already included
+  const relativePath = cleanPath.startsWith("public/")
+    ? cleanPath.replace("public/", "")
+    : cleanPath;
+  const fullPath = path.join(process.cwd(), "public", relativePath);
+  return unsync(fullPath);
 };
+
 export default unsync;

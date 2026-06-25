@@ -156,4 +156,37 @@ export const PaymentRepository = {
       },
     });
   },
-};
+
+  setPaymentStatus: async ({
+    runner,
+    payment,
+    status,
+  }: Runner & { payment: Payment; status: PaymentStatus }) => {
+    try {
+      const repo = runner.manager.getRepository(Payment);
+      payment.status = status;
+      return await repo.save(payment);
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  },
+
+  getPaymentByBookingId: async ({
+    runner,
+    bookingId,
+  }: Runner & { bookingId: number }) => {
+    try {
+      return await runner.manager.getRepository(Payment).findOne({
+        where: {
+          booking: {
+            id: bookingId,
+          },
+        },
+      });
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  },
+}; 

@@ -23,7 +23,7 @@ export const   initializeExpressServer = (app: Express) => {
   const PORT = environment.SERVER_PORT;
   app.listen(PORT, "0.0.0.0", async () => {
     console.log(`Server is running at port ${PORT}`);
-    await startNgrok(PORT);
+   //  await startNgrok(PORT);
   });
 
   

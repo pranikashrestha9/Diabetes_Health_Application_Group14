@@ -1,4 +1,9 @@
-import { CreateUserInput, UpdateUserInput, UserIdInput } from "./user.schema";
+import {
+  CreateUserInput,
+  UpdateProfileImageInput,
+  UpdateUserInput,
+  UserIdInput,
+} from "./user.schema";
 import { Request, Response, NextFunction } from "express";
 import { Exception } from "../../libs/exceptionHandler";
 import { UserService } from "./user.service";
@@ -244,6 +249,50 @@ export const UserController = {
             200,
           ),
         );
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updateProfileImage: async (
+    req: Request<{}, {}, UpdateProfileImageInput>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const userId = req.tokenPayload.userId;
+
+      const data = req.body;
+
+      // ✅ Default image path
+      let profileImagePath = "/public/profile/default.jpg";
+
+      // ✅ If user uploaded file
+      if (req.file && req.file.filename) {
+        profileImagePath = `/public/profile/${req.file.filename}`;
+      }
+
+      // ✅ attach to payload
+      data.profileImageURL = profileImagePath;
+
+      const response = await UserService.updateProfileImage({
+        userId,
+        profileImageURL: data.profileImageURL,
+      });
+
+      if (response.profileImageURL) {
+        response.profileImageURL = `${req.protocol}://${req.get("host")}${response.profileImageURL}`;
+      }
+
+      res.status(200).json(
+        messageFormater(
+          true,
+
+          "Profile image updated successfully",
+          response,
+          200,
+        ),
+      );
     } catch (error) {
       next(error);
     }

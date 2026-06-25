@@ -1,5 +1,8 @@
 import { Exception } from "../../libs/exceptionHandler";
 import ORMHelper from "../../libs/ORMHelper";
+import { unsyncFromPublic } from "../../libs/unsync";
+import { User } from "../../model/BaseEntity";
+import { BookingRepository } from "../Booking/booking.repository";
 import { UserRepository } from "./user.repository";
 import { CreateUserInput } from "./user.schema";
 
@@ -7,6 +10,7 @@ export const UserService = {
   updateUser: async (userId: number, data: Partial<CreateUserInput>) => {
     const runner = await ORMHelper.createQueryRunner();
     try {
+      await ORMHelper.createTransaction(runner);
       const existingData = await UserRepository.findById({
         runner,
         userId: userId,
@@ -19,6 +23,7 @@ export const UserService = {
         existingUser: existingData,
         data,
       });
+
       return response;
     } catch (error: any) {
       throw error;
@@ -104,13 +109,15 @@ export const UserService = {
   getUserWithMedicalData: async (userId: number) => {
     const runner = await ORMHelper.createQueryRunner();
     try {
-
       const isuserExist = await UserRepository.findById({ runner, userId });
       if (!isuserExist) {
         throw new Exception("User not found", 404);
       }
-      
-      const user = await UserRepository.findUserWithMedicalData({ runner, userId });
+
+      const user = await UserRepository.findUserWithMedicalData({
+        runner,
+        userId,
+      });
       if (user) {
         delete (user as any).password;
       }
@@ -122,7 +129,7 @@ export const UserService = {
     }
   },
 
-   getAllDoctors: async () => {
+  getAllDoctors: async () => {
     const runner = await ORMHelper.createQueryRunner();
     try {
       const doctors = await UserRepository.findAllDoctors({ runner });
@@ -134,7 +141,7 @@ export const UserService = {
     }
   },
 
-   getAllPatients: async () => {
+  getAllPatients: async () => {
     const runner = await ORMHelper.createQueryRunner();
     try {
       const patients = await UserRepository.findAllPatients({ runner });
@@ -149,12 +156,72 @@ export const UserService = {
   getAllContentManagers: async () => {
     const runner = await ORMHelper.createQueryRunner();
     try {
-      const contentManagers = await UserRepository.findAllContentManagers({ runner });
+      const contentManagers = await UserRepository.findAllContentManagers({
+        runner,
+      });
       return contentManagers;
     } catch (error) {
       throw error;
     } finally {
       ORMHelper.release(runner);
     }
-  }
+  },
+
+  updateProfileImage: async ({
+    userId,
+    profileImageURL,
+  }: {
+    userId: number;
+    profileImageURL: string;
+  }) => {
+    const runner = await ORMHelper.createQueryRunner();
+
+    try {
+      await ORMHelper.createTransaction(runner);
+
+      const user: User = await UserRepository.findById({
+        runner,
+        userId,
+      });
+
+      if (!user) {
+        throw new Exception("User not found", 404);
+      }
+
+      // ✅ DELETE OLD IMAGE
+      if (
+        user.profileImageURL &&
+        !user.profileImageURL.includes("default.png")
+      ) {
+        console.log("🗑 Removing old image:", user.profileImageURL);
+
+        unsyncFromPublic(user.profileImageURL);
+      }
+
+      // ✅ SAVE NEW IMAGE
+      await UserRepository.updateProfileImage({
+        runner,
+        user,
+        profileImageURL,
+      });
+
+      await ORMHelper.commitTransaction(runner);
+
+      return {
+        message: "Profile image updated successfully",
+        profileImageURL,
+      };
+    } catch (error) {
+      await ORMHelper.rollBackTransaction(runner);
+
+      // ❗ cleanup uploaded file if DB fails
+      if (profileImageURL) {
+        unsyncFromPublic(profileImageURL);
+      }
+
+      throw error;
+    } finally {
+      await ORMHelper.release(runner);
+    }
+  },
 };

@@ -83,7 +83,17 @@ export const UserIdSchema = z.object({
   userId: z.string(),
 });
 
+
+
+
+export const updateProfileImageSchema = z.object({
+  // optional if you pass URL instead of file
+  profileImageURL: z.string().url().optional(),
+});
+
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 export type UpdateUserInput = Partial<CreateUserInput>;
 export type UserIdInput = z.infer<typeof UserIdSchema>;
+
+export type UpdateProfileImageInput = z.infer<typeof updateProfileImageSchema>;

@@ -2,6 +2,7 @@ import { Exception } from "../../libs/exceptionHandler";
 import { MeetLinkGenerator } from "../../libs/linkGenerator";
 import { mailService } from "../../libs/mailService";
 import ORMHelper from "../../libs/ORMHelper";
+import { PaymentStatus } from "../../model/Payment";
 import { DoctorRepository } from "../Doctor/doctorData.repository";
 import { PaymentRepository } from "../Payment/payment.repository";
 import { UserRepository } from "../user/user.repository";
@@ -15,7 +16,7 @@ export const BookingService = {
     bookingData,
   }: {
     userPatientId: number;
-      doctorId: number;
+    doctorId: number;
     bookingData: CreateBookingDTO;
   }) => {
     const runner = await ORMHelper.createQueryRunner();
@@ -64,8 +65,11 @@ export const BookingService = {
         },
       });
 
-
-      const paymentData = await PaymentRepository.create({ runner,booking, amount: doctor.consultationFee });
+      const paymentData = await PaymentRepository.create({
+        runner,
+        booking,
+        amount: doctor.consultationFee,
+      });
 
       const bookingWithPayment = {
         ...booking,
@@ -102,6 +106,17 @@ export const BookingService = {
         throw new Exception("Booking already processed", 400);
       }
 
+      if (!booking.payment) {
+        throw new Exception("Payment not found", 400);
+      }
+
+      if (booking.payment.status !== PaymentStatus.PAID) {
+        throw new Exception("Payment not completed", 400);
+      }
+
+      // ✅ ONLY booking logic
+      booking.status = "CONFIRMED";
+
       // ✅ generate meet link
       const meetLink = MeetLinkGenerator.generate();
 
@@ -115,6 +130,8 @@ export const BookingService = {
         status: "CONFIRMED",
       });
 
+      await ORMHelper.commitTransaction(runner);
+
       // ✅ send email
       await mailService.sendBookingConfirmation({
         patientEmail: booking.patient.email,
@@ -124,8 +141,6 @@ export const BookingService = {
         time: `${booking.startTime} - ${booking.endTime}`,
         meetLink,
       });
-
-      await ORMHelper.commitTransaction(runner);
 
       return booking;
     } catch (error) {
@@ -155,26 +170,44 @@ export const BookingService = {
         throw new Exception("Booking already processed", 400);
       }
 
-      booking.status = "CANCELLED";
+      if (!booking.payment) {
+        throw new Exception("Payment not found", 400);
+      }
 
+      if (booking.payment.status !== PaymentStatus.PAID) {
+        throw new Exception("Payment not completed", 400);
+      }
+
+      // ✅ 1. Cancel booking
       await BookingRepository.updateStatus({
         runner,
         booking,
         status: "CANCELLED",
       });
 
+      // ✅ 2. Refund payment (using your existing method)
+      await PaymentRepository.setPaymentStatus({
+        runner,
+        payment: booking.payment,
+        status: PaymentStatus.REFUNDED,
+      });
+
+      // ✅ 3. Send email
       await mailService.sendBookingCancellation({
         patientEmail: booking.patient.email,
         patientName: booking.patient.firstName,
         doctorName: booking.doctor.user.firstName,
         date: booking.bookingDate,
         time: `${booking.startTime} - ${booking.endTime}`,
-        reason: "Doctor unavailable", // optional
+        reason: "Doctor unavailable",
       });
 
       await ORMHelper.commitTransaction(runner);
 
-      return booking;
+      return {
+        message: "Booking cancelled and payment refunded",
+        bookingId: booking.id,
+      };
     } catch (error) {
       await ORMHelper.rollBackTransaction(runner);
       throw error;

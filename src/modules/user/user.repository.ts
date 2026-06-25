@@ -106,55 +106,71 @@ export const UserRepository = {
 
   findAllDoctors: async ({ runner }: Runner) => {
     const repo = runner.manager.getRepository(User);
-    try{
+    try {
       const doctors = await repo.find({
         where: { role: "DOCTOR" },
       });
       return doctors;
-
-    }catch(error: any){
+    } catch (error: any) {
       error.level = "DB";
       throw error;
     }
-   },
+  },
 
-    findAllPatients: async ({ runner }: Runner) => {
-      const repo = runner.manager.getRepository(User);
-      try{
-         const patients = await repo.find({ where: { role: "PATIENT" } });
-         return patients;
-      }catch(error: any){
-        error.level = "DB";
-        throw error;
-      }
-   },
-
-   findAllContentManagers: async ({ runner }: Runner) => {
+  findAllPatients: async ({ runner }: Runner) => {
     const repo = runner.manager.getRepository(User);
-    try{
-       const contentManagers = await repo.find({ where: { role: "CONTENT_MANAGER" } });
-       return contentManagers;
-    }catch(error: any){
+    try {
+      const patients = await repo.find({ where: { role: "PATIENT" } });
+      return patients;
+    } catch (error: any) {
       error.level = "DB";
       throw error;
     }
-   }
+  },
 
-//   update: async ({
-//     runner,
-//     existingUser,
-//     data,
-//   }: Runner & {
-//     existingUser: User;
-//     data: Partial<CreateUserInput>;
-//   }) => {
-//     const repo = runner.manager.getRepository(User);
-//     try {
-//       Object.assign(existingUser, data);
-//       return await repo.save(existingUser);
-//     } catch (error: any) {
-//       error.level = "DB";
-//       throw error;
-//     }
-//   },
+  findAllContentManagers: async ({ runner }: Runner) => {
+    const repo = runner.manager.getRepository(User);
+    try {
+      const contentManagers = await repo.find({
+        where: { role: "CONTENT_MANAGER" },
+      });
+      return contentManagers;
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  },
+  updateProfileImage: async ({
+    runner,
+    user,
+    profileImageURL,
+  }: Runner & { user: User; profileImageURL: string }) => {
+    const repo = runner.manager.getRepository(User);
+    try {
+      user.profileImageURL = profileImageURL;
+
+      return await repo.save(user);
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  },
+
+  //   update: async ({
+  //     runner,
+  //     existingUser,
+  //     data,
+  //   }: Runner & {
+  //     existingUser: User;
+  //     data: Partial<CreateUserInput>;
+  //   }) => {
+  //     const repo = runner.manager.getRepository(User);
+  //     try {
+  //       Object.assign(existingUser, data);
+  //       return await repo.save(existingUser);
+  //     } catch (error: any) {
+  //       error.level = "DB";
+  //       throw error;
+  //     }
+  //   },
 };

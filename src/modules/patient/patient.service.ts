@@ -38,6 +38,7 @@ export const PatientService = {
       runner,
       userId,
     });
+    console.log("Existing patient:", existingPatient);
 
     if (existingPatient) {
       throw new Exception("Patient medical data already exists", 400);
