@@ -35,7 +35,7 @@ export const BookingService = {
       }
 
       // ✅ 2. Check doctor exists
-      const doctor = await UserRepository.findById({
+      const doctor = await DoctorRepository.findByUserId({
         runner,
         userId: doctorId,
       });
