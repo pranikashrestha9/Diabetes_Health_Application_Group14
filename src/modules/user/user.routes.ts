@@ -53,6 +53,15 @@ export const userRoutes = (router: Router) => {
     UserController.getUserWithMedicalData,
   );
 
+    router.get(
+    "/user-doctor-data/:userId",
+    ZOD.requestParser({
+      schema: UserIdSchema,
+      type: "Params",
+    }),
+    UserController.getUserWithDoctorData,
+  );
+
   router.get(
     "/user/:userId",
     validateToken({ checkAdmin: true }),

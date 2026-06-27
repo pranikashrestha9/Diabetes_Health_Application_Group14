@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   OneToOne,
 } from "typeorm";
-import { User } from "./BaseEntity";
+import { User } from "./User";
 import { Doctor } from "./Doctor";
 import { Payment } from "./Payment";
 
@@ -51,9 +51,8 @@ export class Booking {
   @CreateDateColumn()
   createdAt: Date;
 
-@OneToOne(() => Payment, (payment) => payment.booking, {
-  eager: true,
-})
-payment: Payment;
-  
+  @OneToOne(() => Payment, (payment) => payment.booking, {
+    eager: true,
+  })
+  payment: Payment;
 }

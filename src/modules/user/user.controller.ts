@@ -297,4 +297,30 @@ export const UserController = {
       next(error);
     }
   },
+
+
+   getUserWithDoctorData: async (
+    req: Request<UserIdInput>,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const { userId } = req.params;
+
+      const id = Number(userId);
+
+      const response = await UserService.getUserWithDoctorData(id);
+
+      if (response.profileImageURL) {
+        response.profileImageURL = `${req.protocol}://${req.get("host")}${response.profileImageURL}`;
+      }
+      res
+        .status(200)
+        .json(
+          messageFormater(true, response, "User with doctor data found", 200),
+        );
+    } catch (error) {
+      next(error);
+    }
+  },
 };

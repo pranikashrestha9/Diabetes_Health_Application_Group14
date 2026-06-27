@@ -1,7 +1,7 @@
 import { Exception } from "../../libs/exceptionHandler";
 import ORMHelper from "../../libs/ORMHelper";
 import { unsyncFromPublic } from "../../libs/unsync";
-import { User } from "../../model/BaseEntity";
+import { User } from "../../model/User";
 import { BookingRepository } from "../Booking/booking.repository";
 import { UserRepository } from "./user.repository";
 import { CreateUserInput } from "./user.schema";
@@ -115,6 +115,29 @@ export const UserService = {
       }
 
       const user = await UserRepository.findUserWithMedicalData({
+        runner,
+        userId,
+      });
+      if (user) {
+        delete (user as any).password;
+      }
+      return user;
+    } catch (error) {
+      throw error;
+    } finally {
+      ORMHelper.release(runner);
+    }
+  },
+
+  getUserWithDoctorData: async (userId: number) => {
+    const runner = await ORMHelper.createQueryRunner();
+    try {
+      const isuserExist = await UserRepository.findById({ runner, userId });
+      if (!isuserExist) {
+        throw new Exception("User not found", 404);
+      }
+
+      const user = await UserRepository.findUserWithDoctorData({
         runner,
         userId,
       });

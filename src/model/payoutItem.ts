@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { DoctorPayout } from "./Payout";
 import { Payment } from "./Payment";
 
@@ -10,9 +10,11 @@ export class PayoutItem {
   @ManyToOne(() => DoctorPayout, (payout) => payout.items, {
     onDelete: "CASCADE",
   })
+  @JoinColumn({ name: "payout_id" })
   payout: DoctorPayout;
 
   @ManyToOne(() => Payment, { eager: true })
+  @JoinColumn({ name: "payment_id" })
   payment: Payment;
 
   @Column("decimal", { precision: 10, scale: 2 })

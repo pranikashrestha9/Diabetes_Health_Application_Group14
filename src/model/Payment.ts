@@ -45,4 +45,7 @@ export class Payment {
 
   @Column({ nullable: true })
   paidAt: Date;
+
+  @Column({ default: false })
+isSettled: boolean;
 }

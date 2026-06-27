@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import { User } from "../model/BaseEntity";
+import { User } from "../model/User";
 import { hashPassword } from "../libs/passhash";
 
 export const seedAdmin = async (dataSource: DataSource) => {

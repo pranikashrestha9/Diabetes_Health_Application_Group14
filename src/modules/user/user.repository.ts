@@ -1,6 +1,6 @@
 import { Runner } from "../../global/global";
 import { hashPassword } from "../../libs/passhash";
-import { User } from "../../model/BaseEntity";
+import { User } from "../../model/User";
 import { CreateUserInput } from "./user.schema";
 
 export const UserRepository = {
@@ -173,4 +173,21 @@ export const UserRepository = {
   //       throw error;
   //     }
   //   },
+
+  findUserWithDoctorData: async ({
+    runner,
+    userId,
+  }: Runner & { userId: number }) => {
+    const repo = runner.manager.getRepository(User);
+
+    try {
+      return await repo.findOne({
+        where: { userId },
+        relations: ["doctor"],
+      });
+    } catch (error: any) {
+      error.level = "DB";
+      throw error;
+    }
+  },
 };

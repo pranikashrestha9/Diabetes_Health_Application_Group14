@@ -5,7 +5,7 @@ import {
   OneToOne,
   JoinColumn,
 } from "typeorm";
-import { User } from "./BaseEntity";
+import { User } from "./User";
 
 @Entity()
 export class Doctor {

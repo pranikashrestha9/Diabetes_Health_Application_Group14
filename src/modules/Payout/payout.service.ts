@@ -1,26 +1,41 @@
 import ORMHelper from "../../libs/ORMHelper";
 import { Payment } from "../../model/Payment";
+import { DoctorRepository } from "../Doctor/doctorData.repository";
 import { PaymentRepository } from "../Payment/payment.repository";
 import { PayoutItemRepository } from "../PayoutItem/payoutItem.repository";
 import { PayoutRepository } from "./payout.repository";
 
 export const PayoutService = {
   createPayout: async (data: {
-    doctorId: number;
+    doctorUserId: number;
     markAsPaid?: boolean;
-    
   }) => {
     const runner = await ORMHelper.createQueryRunner();
     await runner.startTransaction();
 
     try {
-      const { doctorId, markAsPaid } = data;
+      const { doctorUserId, markAsPaid } = data;
+
+      const doctor = await DoctorRepository.findByUserId({
+        runner,
+        userId: doctorUserId,
+      });
+
+      if (!doctor) {
+        throw new Error("Doctor not found");
+      }
+      const doctorId = doctor.id;
 
       // ✅ 1. AUTO FETCH ALL PAID PAYMENTS
       const payments = await PaymentRepository.findPaidByDoctor({
         runner,
-        doctorId,
+        doctorUserId,
       });
+
+      console.log(
+        "🚀 ~ file: payout.service.ts:22 ~ createPayout: ~ payments:",
+        payments,
+      );
 
       if (!payments.length) {
         throw new Error("No paid payments found for this doctor");
@@ -55,7 +70,7 @@ export const PayoutService = {
         doctorId,
         totalAmount,
         status: markAsPaid ? "PAID" : "PENDING",
-       
+
         paidAt: markAsPaid ? new Date() : null,
       });
 
@@ -68,6 +83,11 @@ export const PayoutService = {
           doctorEarning: item.doctorEarning,
         });
       }
+
+      await PaymentRepository.markAsSettled({
+        runner,
+        paymentIds: payments.map((p: Payment) => p.paymentId),
+      });
 
       await runner.commitTransaction();
 

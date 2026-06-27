@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-import { User } from "./BaseEntity";
+import { User } from "./User";
 
 export enum BlogStatus {
   DRAFT = "DRAFT",

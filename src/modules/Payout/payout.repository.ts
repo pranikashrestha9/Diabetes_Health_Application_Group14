@@ -1,6 +1,8 @@
+import { In } from "typeorm";
 import { Runner } from "../../global/global";
 
 import { DoctorPayout } from "../../model/Payout";
+import { Payment } from "../../model/Payment";
 
 export const PayoutRepository = {
   create: async ({
@@ -32,4 +34,6 @@ export const PayoutRepository = {
       throw error;
     }
   },
+
+
 };

@@ -11,12 +11,12 @@ export const PayoutController = {
     next: NextFunction,
   ) => {
     try {
-      const doctorId = Number(req.params.userId);
+      const doctorUserId = Number(req.params.userId);
 
-      if (isNaN(doctorId)) {
-        throw new Error("Invalid doctor id");
+      if (isNaN(doctorUserId)) {
+        throw new Error("Invalid doctor user id");
       }
-      const body = { doctorId, markAsPaid: true };
+      const body = { doctorUserId, markAsPaid: true };
 
       const result = await PayoutService.createPayout(body);
 

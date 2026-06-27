@@ -45,6 +45,7 @@ export const PaymentRepository = {
                 userId: doctorUserId,
               },
             },
+            status: "CONFIRMED", // ✅ IMPORTANT
           },
           status: "PAID",
         },
@@ -58,7 +59,6 @@ export const PaymentRepository = {
       let totalPlatformCut = 0;
       let totalDoctorEarning = 0;
 
-      // 🧾 Booking-wise data
       const bookings = payments.map((p: Payment) => {
         const platformCut = p.amount * 0.2;
         const doctorEarning = p.amount * 0.8;
@@ -72,18 +72,19 @@ export const PaymentRepository = {
           date: p.booking.bookingDate,
           status: p.booking.status,
           paymentStatus: p.status,
+          isSettled: p.isSettled, // ✅ NEW
           amount: p.amount,
           platformCut,
           doctorEarning,
         };
       });
 
-      // 💳 Raw payment data (NEW)
       const paymentData = payments.map((p: Payment) => ({
         paymentId: p.paymentId,
         bookingId: p.booking.id,
         amount: p.amount,
         status: p.status,
+        isSettled: p.isSettled, // ✅ NEW
         transactionId: p.transactionId,
         paidAt: p.paidAt,
         createdAt: p.createdAt,
@@ -91,21 +92,11 @@ export const PaymentRepository = {
 
       return {
         doctorId: doctor.id,
-        doctorName: `Dr. ${doctor.user.firstName} ${doctor.user.lastName}`,
-        specialization: doctor.specialization,
-        consultationFee: doctor.consultationFee,
-
-        summary: {
-          totalBookings: payments.length,
-          totalRevenue,
-          platformCut: totalPlatformCut,
-          doctorEarning: totalDoctorEarning,
-        },
-
+        totalRevenue,
+        totalPlatformCut,
+        totalDoctorEarning,
         bookings,
-
-        // ✅ ADD THIS
-        payments: paymentData,
+        paymentData,
       };
     } catch (error: any) {
       error.level = "DB";
@@ -142,19 +133,31 @@ export const PaymentRepository = {
 
   findPaidByDoctor: async ({
     runner,
-    doctorId,
-  }: Runner & { doctorId: number }) => {
-    return await runner.manager.getRepository(Payment).find({
-      relations: ["booking", "booking.doctor", "booking.doctor.user"],
-      where: {
-        status: "PAID",
-        booking: {
-          doctor: {
-            id: doctorId,
-          },
-        },
-      },
-    });
+    doctorUserId,
+  }: Runner & { doctorUserId: number }) => {
+    try {
+      const payments = await runner.manager
+        .getRepository(Payment)
+        .createQueryBuilder("payment")
+        .leftJoinAndSelect("payment.booking", "booking")
+        .leftJoinAndSelect("booking.doctor", "doctor")
+        .leftJoinAndSelect("doctor.user", "user")
+        .where("payment.status = :status", { status: "PAID" })
+        .andWhere("(payment.isSettled = false OR payment.isSettled IS NULL)") // ✅ safe
+        .andWhere("booking.status = :bookingStatus", {
+          bookingStatus: "CONFIRMED",
+        })
+        .andWhere("user.userId = :doctorUserId", { doctorUserId }) // ✅ KEY FIX
+        .getMany();
+
+      // console.log("✅ FILTERED PAYMENTS:", payments);
+
+      return payments;
+    } catch (error: any) {
+      error.level = "DB";
+      console.error("❌ Error in findPaidByDoctor:", error);
+      throw error;
+    }
   },
 
   setPaymentStatus: async ({
@@ -189,4 +192,19 @@ export const PaymentRepository = {
       throw error;
     }
   },
-}; 
+
+  markAsSettled: async ({
+    runner,
+    paymentIds,
+  }: Runner & { paymentIds: number[] }) => {
+    try {
+      await runner.manager
+        .getRepository(Payment)
+        .update({ paymentId: In(paymentIds) }, { isSettled: true });
+    } catch (error: any) {
+      error.level = "DB";
+      console.error("❌ Error in markAsSettled:", error);
+      throw error;
+    }
+  },
+};

@@ -5,15 +5,15 @@ import {
   OneToOne,
   JoinColumn,
 } from "typeorm";
-import { User } from "./BaseEntity";
+import { User } from "./User";
 
 @Entity()
 export class Patient {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User, {onDelete: "CASCADE" })
-   @JoinColumn({ name: "userId" })
+  @OneToOne(() => User, { onDelete: "CASCADE" })
+  @JoinColumn({ name: "userId" })
   user: User;
 
   @Column()
@@ -31,11 +31,11 @@ export class Patient {
   @Column("float")
   weightKG: number;
 
-@Column({
-  type: "enum",
-  enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], // ✅ FIXED
-})
-bloodGroup: string;;
+  @Column({
+    type: "enum",
+    enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], // ✅ FIXED
+  })
+  bloodGroup: string;
 
   @Column()
   emergencyContactName: string;
