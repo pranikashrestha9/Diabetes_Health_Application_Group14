@@ -12,7 +12,7 @@ export const AppDataSource: DataSource = new DataSource({
   synchronize: true,
   logging: false,
   dropSchema: false,
-  entities: ["src/model/**/*.ts"],
+  entities: [__dirname + "/../model/**/*.{js,ts}"],
 });
 
 export const initializeDataSource = async () => {

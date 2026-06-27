@@ -40,12 +40,18 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/users",
-    //  validateToken({ checkAdmin: true }),
+   validateToken({ checkAdmin: true }),
     UserController.getAllUsers,
   );
 
   router.get(
     "/user-medical-data/:userId",
+    validateToken({
+      checkAdmin: true,
+      checkPatient: true,
+      checkDoctor: true,
+      checkInternalManager: true,
+    }),
     ZOD.requestParser({
       schema: UserIdSchema,
       type: "Params",
@@ -53,8 +59,14 @@ export const userRoutes = (router: Router) => {
     UserController.getUserWithMedicalData,
   );
 
-    router.get(
+  router.get(
     "/user-doctor-data/:userId",
+    validateToken({
+      checkAdmin: true,
+      checkPatient: true,
+      checkDoctor: true,
+      checkInternalManager: true,
+    }),
     ZOD.requestParser({
       schema: UserIdSchema,
       type: "Params",
@@ -134,7 +146,11 @@ export const userRoutes = (router: Router) => {
 
   router.patch(
     "/update-profile-image",
-    validateToken({ checkPatient: true, checkDoctor: true, checkInternalManager: true }),
+    validateToken({
+      checkPatient: true,
+      checkDoctor: true,
+      checkInternalManager: true,
+    }),
     MulterHelper.getStorage(path.resolve("public/profile"), {
       moduleName: "user",
       isFile: false,

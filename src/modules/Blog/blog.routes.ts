@@ -29,7 +29,7 @@ export const blogRouter = (router: Router) => {
   // 🔐 Protected
   router.get("/blog:blogId", BlogController.getById);
 
-  router.get("/published-blogs", validateToken(), BlogController.getAll);
+  router.get("/published-blogs", BlogController.getAll);
 
   router.get(
     "/draft-blogs",
