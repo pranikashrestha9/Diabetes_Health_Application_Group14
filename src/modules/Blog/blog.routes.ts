@@ -3,12 +3,21 @@ import { validateToken } from "../../auth/validateToken";
 import ZOD from "../../middlewares/schemaValidator";
 import { blogIdParam, createBlogSchema } from "./blog.schema";
 import { BlogController } from "./blog.controller";
+import path from "node:path";
+import { MulterHelper } from "../../middlewares/multer";
 
 export const blogRouter = (router: Router) => {
   // 🔐 Create (Admin / Manager)
   router.post(
     "/blog",
+   // (req) => console.log("hello", req.body),
     validateToken({ checkInternalManager: true }),
+
+    MulterHelper.getStorage(path.resolve("public/blog"), {
+      moduleName: "blog",
+      isFile: false,
+    }).single("coverImage"),
+    
     ZOD.requestParser({
       schema: createBlogSchema,
       type: "Body",

@@ -1,5 +1,5 @@
-export const jobseekerCV = [{ name: "userProfile", maxCount: 1 }];
-export const jobRequirements = [{ name: "jobRequirements", maxCount: 1 }];
+export const profile = [{ name: "userProfile", maxCount: 1 }];
+export const coverImage = [{ name: "coverImage", maxCount: 1 }];
 
 
 
