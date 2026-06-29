@@ -173,10 +173,16 @@ export const BookingService = {
       if (!booking.payment) {
         throw new Exception("Payment not found", 400);
       }
+      console.log("booking", booking);
 
       if (booking.payment.status !== PaymentStatus.PAID) {
         throw new Exception("Payment not completed", 400);
       }
+
+      if (booking.payment.status === PaymentStatus.REFUNDED) {
+        throw new Exception("Payment already refunded", 400);
+      }
+     
 
       // ✅ 1. Cancel booking
       await BookingRepository.updateStatus({
@@ -185,6 +191,8 @@ export const BookingService = {
         status: "CANCELLED",
       });
 
+     
+
       // ✅ 2. Refund payment (using your existing method)
       await PaymentRepository.setPaymentStatus({
         runner,
@@ -192,15 +200,22 @@ export const BookingService = {
         status: PaymentStatus.REFUNDED,
       });
 
+      console.log("booking", booking);
+
       // ✅ 3. Send email
       await mailService.sendBookingCancellation({
-        patientEmail: booking.patient.email,
-        patientName: booking.patient.firstName,
+        patientEmail: booking.patient.user.email,
+        patientName: booking.patient.user.firstName,
         doctorName: booking.doctor.user.firstName,
         date: booking.bookingDate,
         time: `${booking.startTime} - ${booking.endTime}`,
         reason: "Doctor unavailable",
       });
+
+      console.log("booking", booking);
+
+      console.log("booking.payment:", booking.payment);
+      console.log("booking.doctor.user:", booking.doctor?.user);
 
       await ORMHelper.commitTransaction(runner);
 

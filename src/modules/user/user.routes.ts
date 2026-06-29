@@ -40,7 +40,7 @@ export const userRoutes = (router: Router) => {
 
   router.get(
     "/users",
-   validateToken({ checkAdmin: true }),
+   validateToken({ checkAdmin: true , checkInternalManager: true}),
     UserController.getAllUsers,
   );
 
@@ -135,7 +135,7 @@ export const userRoutes = (router: Router) => {
   );
   router.get(
     "/doctors",
-    validateToken({ checkAdmin: true, checkPatient: true }),
+    validateToken({ checkAdmin: true, checkPatient: true , checkInternalManager: true}),
     UserController.getAllDoctors,
   );
   router.get(

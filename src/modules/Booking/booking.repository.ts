@@ -55,7 +55,7 @@ export const BookingRepository = {
 
     return await repo.findOne({
       where: { id },
-      relations: ["patient", "doctor", "doctor.user"],
+      relations: ["patient", "doctor", "doctor.user","payment", "patient.user"],
     });
   },
 
