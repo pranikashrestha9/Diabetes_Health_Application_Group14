@@ -5,15 +5,20 @@ import { messageFormater } from "../../libs/messageFormater";
 
 export const PaymentController = {
   getDoctorFinanceDetails: async (
-    req: Request<DoctorIdParamType>,
+    req: Request<DoctorIdParamType, {}, {}, { settled?: string }>,
     res: Response,
     next: NextFunction,
   ) => {
     try {
       const doctorUserId = Number(req.params.doctorId);
 
-      const response =
-        await PaymentService.getDoctorFinanceDetails(doctorUserId);
+      // 👇 NEW
+      const { settled } = req.query;
+
+      const response = await PaymentService.getDoctorFinanceDetails(
+        doctorUserId,
+        settled as string | undefined,
+      );
 
       if (!response) {
         return res

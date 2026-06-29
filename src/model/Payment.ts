@@ -24,7 +24,7 @@ export class Payment {
   @OneToOne(() => Booking, (booking) => booking.payment, {
     onDelete: "CASCADE",
   })
-  @JoinColumn()
+  @JoinColumn({ name: "bookingId" })
   booking: Booking;
 
   @Column()

@@ -114,18 +114,17 @@ export const PrescriptionController = {
         bookingId,
       });
 
-   
-    if (!pdf) {
-      throw new Error("PDF not generated");
-    }
+      if (!pdf) {
+        throw new Error("PDF not generated");
+      }
 
-    res.writeHead(200, {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename=prescription-${bookingId}.pdf`,
-      "Content-Length": pdf.length,
-    });
+      res.writeHead(200, {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=prescription-${bookingId}.pdf`,
+        "Content-Length": pdf.length,
+      });
 
-    res.end(pdf);
+      res.end(pdf);
     } catch (error) {
       next(error);
     }

@@ -170,10 +170,12 @@ export const BookingService = {
         throw new Exception("Booking already processed", 400);
       }
 
+      console.log("booking.payment:", booking.payment);
+
       if (!booking.payment) {
         throw new Exception("Payment not found", 400);
       }
-      console.log("booking", booking);
+      console.log("booking.payment.status:1", booking.payment.status);
 
       if (booking.payment.status !== PaymentStatus.PAID) {
         throw new Exception("Payment not completed", 400);
@@ -182,8 +184,8 @@ export const BookingService = {
       if (booking.payment.status === PaymentStatus.REFUNDED) {
         throw new Exception("Payment already refunded", 400);
       }
-     
 
+      console.log("booking.payment.status:2", booking.payment.status);
       // ✅ 1. Cancel booking
       await BookingRepository.updateStatus({
         runner,
@@ -191,28 +193,33 @@ export const BookingService = {
         status: "CANCELLED",
       });
 
-     
-
       // ✅ 2. Refund payment (using your existing method)
-      await PaymentRepository.setPaymentStatus({
+      const refundedPayment = await PaymentRepository.setPaymentStatus({
         runner,
         payment: booking.payment,
         status: PaymentStatus.REFUNDED,
       });
 
-      console.log("booking", booking);
+      const doctorName = booking.doctor?.user?.firstName;
+
+      if (!doctorName) {
+        throw new Exception("Doctor user not found", 500);
+      }
+
+      console.log("refundedPayment:", refundedPayment);
+
+      console.log("patientemail:", booking.patient.email);
+      console.log("doctorname:", booking.doctor.user.firstName);
 
       // ✅ 3. Send email
       await mailService.sendBookingCancellation({
-        patientEmail: booking.patient.user.email,
-        patientName: booking.patient.user.firstName,
-        doctorName: booking.doctor.user.firstName,
+        patientEmail: booking.patient.email,
+        patientName: booking.patient.firstName,
+        doctorName: doctorName,
         date: booking.bookingDate,
         time: `${booking.startTime} - ${booking.endTime}`,
         reason: "Doctor unavailable",
       });
-
-      console.log("booking", booking);
 
       console.log("booking.payment:", booking.payment);
       console.log("booking.doctor.user:", booking.doctor?.user);

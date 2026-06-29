@@ -81,7 +81,6 @@ export const BookingController = {
 
       const response = await BookingService.denyBooking(id);
 
-      const cleanResponse = formatBookingResponse(response);
          
       res
         .status(200)
