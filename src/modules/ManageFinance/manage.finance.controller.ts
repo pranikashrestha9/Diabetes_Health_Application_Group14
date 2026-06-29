@@ -1,45 +1,47 @@
+import { Request,Response,NextFunction } from "express";
+import { ManageFinanceService } from "./manage.finance.service";
 
 
 
-// export const ManagerFinanceController = {
-//   getSummary: async (req:Request, res:Response, next:NextFunction) => {
-//     try {
-//       const doctorId = Number(req.params.doctorId);
+export const ManageFinanceController = {
+  getSummary: async (req:Request, res:Response, next:NextFunction) => {
+    try {
+      const doctorId = Number(req.params.doctorId);
 
-//       const data = await ManagerFinanceService.getSummary(doctorId);
+      const data = await ManageFinanceService.getSummary(doctorId);
 
-//       res.json({
-//         success: true,
-//         data,
-//       });
-//     } catch (err) {
-//       next(err);
-//     }
-//   },
+      res.json({
+        success: true,
+        data,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
 
-//   getPaymentHistory: async (req, res, next) => {
-//     try {
-//       const doctorId = Number(req.params.doctorId);
+  getPaymentHistory: async (req:Request, res:Response, next:NextFunction) => {
+    try {
+      const doctorId = Number(req.params.doctorId);
 
-//       const data =
-//         await ManagerFinanceService.getPaymentHistory(doctorId);
+      const data =
+        await ManageFinanceService.getPaymentHistory(doctorId);
 
-//       res.json({ success: true, data });
-//     } catch (err) {
-//       next(err);
-//     }
-//   },
+      res.json({ success: true, data });
+    } catch (err) {
+      next(err);
+    }
+  },
 
-//   getPayoutHistory: async (req, res, next) => {
-//     try {
-//       const doctorId = Number(req.params.doctorId);
+  getPayoutHistory: async (req:Request, res:Response, next:NextFunction) => {
+    try {
+      const doctorId = Number(req.params.doctorId);
 
-//       const data =
-//         await ManagerFinanceService.getPayoutHistory(doctorId);
+      const data =
+        await ManageFinanceService.getPayoutHistory(doctorId);
 
-//       res.json({ success: true, data });
-//     } catch (err) {
-//       next(err);
-//     }
-//   },
-// };
+      res.json({ success: true, data });
+    } catch (err) {
+      next(err);
+    }
+  },
+};

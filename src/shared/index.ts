@@ -11,6 +11,7 @@ import { RecommendationRoutes } from "../modules/Recommendation/recommendation.r
 import { blogRouter } from "../modules/Blog/blog.routes";
 import { paymentRouter } from "../modules/Payment/payment.routes";
 import { payoutRoutes } from "../modules/Payout/payout.routes";
+import { financeRoutes } from "../modules/ManageFinance/manage.finance.routes";
 
 export const router = (app: Express) => {
   const router = Router();
@@ -27,6 +28,7 @@ export const router = (app: Express) => {
   blogRouter(router);
   paymentRouter(router);
   payoutRoutes(router);
+  financeRoutes(router);
   app.use("/api/v1/", router);
   app.get("/", (req, res) => {
     res.status(200).json({ message: "Server is healthy" });
